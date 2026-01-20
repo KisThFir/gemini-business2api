@@ -49,6 +49,10 @@ COPY --from=frontend-builder /app/static ./static
 # 创建数据目录
 RUN mkdir -p ./data
 
+# 复制启动脚本
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 # 声明数据卷
 VOLUME ["/app/data"]
 
@@ -59,6 +63,5 @@ EXPOSE 7860
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:7860/admin/health || exit 1
 
-# 启动服务（使用 xvfb-run 提供虚拟显示器，支持有头模式浏览器）
-CMD ["xvfb-run", "--auto-servernum", "--server-args=-screen 0 1280x800x24", "python", "-u", "main.py"]
-
+# 启动服务
+CMD ["./entrypoint.sh"]
